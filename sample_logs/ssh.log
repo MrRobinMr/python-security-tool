@@ -1,0 +1,5 @@
+Jan 12 10:15:01 server sshd[1234]: Failed password for root from 203.0.113.5 port 54321
+Jan 12 10:15:03 server sshd[1235]: Failed password for root from 203.0.113.5 port 54322
+Jan 12 10:15:05 server sshd[1236]: Failed password for admin from 203.0.113.5 port 54323
+Jan 12 10:15:07 server sshd[1237]: Failed password for admin from 203.0.113.5 port 54324
+Jan 12 10:15:09 server sshd[1238]: Accepted password for john from 192.168.1.10 port 60234
