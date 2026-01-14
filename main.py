@@ -1,39 +1,38 @@
 from report import get_report
-from rich.console import Console
-from rich.table import Table
+from print_table import print_table
+import export
+import argparse
+import sys
 
-report = get_report("sample_logs/apache.log")
+def main():
+    parser = argparse.ArgumentParser(description="Security Log Analyzer & OSINT Scanner")
 
-console = Console()
+    parser.add_argument(
+        "--log",
+        "-l",
+        type=str,
+        help="Path to the log file (e.g., sample_logs/apache.log)",
+        required=True
+    )
 
-def print_table(report):
-    table = Table(show_header=True, header_style="bold cyan", box=None)
-    table.add_column("IP", style="magenta", no_wrap=True)
-    table.add_column("Requests", style="white")
-    table.add_column("AdminRequests", style="white")
-    table.add_column("FailedLogins", style="white")
-    table.add_column("AbuseScore", style="magenta")
-    table.add_column("VT", style="magenta")
-    table.add_column("Country", style="white")
-    table.add_column("Risk", justify="right")
-    table.add_column("Score", justify="right")
-    for row in report:
-        risk_style = "bold red" if row["Risk"] == "HIGH" else "bold yellow" if row["Risk"] == "MEDIUM" else "green"
+    args = parser.parse_args()
 
-        table.add_row(
-            row["IP"],
-            str(row["Requests"]),
-            str(row.get("AdminRequests", 0)),
-            str(row.get("FailedLogins", 0)),
-            str(row.get("AbuseScore", 0)),
-            str(row.get("VT", 0)),
-            row["Country"],
-            f"[{risk_style}]{row['Risk']}[/]",
-            str(row["Score"])
-        )
-    console.print(table)
+    log_path = args.log
 
-if report:
-    print_table(report)
-else:
-    console.print("[bold yellow]No suspicious data found.[/bold yellow]")
+    try:
+        report = get_report(log_path)
+
+        if report:
+            print_table(report)
+            export.save_to_csv(report)
+            export.save_to_json(report)
+        else:
+            print("No suspicious data found.")
+
+    except FileNotFoundError:
+        print(f"Error: File '{log_path}' not found.")
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
