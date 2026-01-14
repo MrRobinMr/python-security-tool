@@ -37,14 +37,15 @@ def parse_apache_log(lines):
 def parse_ssh_log(lines):
     result = []
 
-    pattern = r"from (\d+\.\d+\.\d+\.\d+)"
+    pattern = r"for (\w+) from (\d+\.\d+\.\d+\.\d+)"
 
     for line in lines:
         match = re.search(pattern, line)
         if not match:
             continue
 
-        ip = match.group(1)
+        user = match.group(1)
+        ip = match.group(2)
 
         if "Failed password" in line:
             event = "failed_login"
@@ -56,6 +57,7 @@ def parse_ssh_log(lines):
         result.append(
             {
                 "ip": ip,
+                "user": user,
                 "event": event,
                 "raw": line.strip()
             }
