@@ -46,7 +46,6 @@ def get_report(log_file):
 
     # requests report
     requests_report = ip_detector(log_type, data)
-    print(requests_report)
 
     # env data import
     load_dotenv()
@@ -60,6 +59,9 @@ def get_report(log_file):
         if info["suspicious"]:
             suspicious.append(osTool.check_ip(ip))
             osinttool_data = osTool.check_ip(ip)
+            country = osinttool_data.get("country")
+            if not country:
+                country = "Unknown"
 
             score, risk = calculate_risk(requests_report[ip])
 
@@ -71,7 +73,7 @@ def get_report(log_file):
                     "FailedLogins": requests_report[ip].get("failed_logins", 0),
                     "AbuseScore": osinttool_data["abuse_score"],
                     "VT": osinttool_data["vt_malicious"],
-                    "Country": osinttool_data["country"],
+                    "Country": country,
                     "Risk": risk,
                     "Score": score
                 }
