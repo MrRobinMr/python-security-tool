@@ -24,6 +24,17 @@ def admin_counter(log_type, data):
     admin_count = Counter(ip_list)
     return admin_count
 
+def failed_logins(log_type, data):
+    ip_list = []
+
+    if log_type == "sshd":
+        for item in data:
+            if item.get("event") in ["failed_login"]:
+                ip_list.append(item["ip"])
+
+    failed_logins_count = Counter(ip_list)
+    return failed_logins_count
+
 # Main if filter
 def ip_detector(log_type, data):
     final_data = {}
@@ -31,15 +42,19 @@ def ip_detector(log_type, data):
 
     all_requests = request_counter(ip_list)
     admin_request = admin_counter(log_type, data)
+    failed_login_requests = failed_logins(log_type, data)
 
     for ip in all_requests:
         requests = all_requests[ip]
         admin_attempts = admin_request.get(ip, 0)
+        failed_log = failed_login_requests.get(ip, 0)
+
         is_suspicious = requests > 20
 
         final_data[ip] = {
             "requests": requests,
             "admin_attempts": admin_attempts,
+            "failed_login": failed_log,
             "suspicious": is_suspicious
         }
 
